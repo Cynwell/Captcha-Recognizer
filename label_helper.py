@@ -11,10 +11,10 @@ def selectFilesLayout():
     ]
     return layout
 
-def inputFilenameLayout(fileAbsDir, filename):
+def inputFilenameLayout(displayImage):
     layout = [
-                [sg.Image(fileAbsDir + '/' + filename + '.png')],
-                [sg.InputText(key="Answer", )],
+                [displayImage],
+                [sg.InputText(key="Answer", do_not_clear=False)],
                 [prevBtn, nextBtn]
     ]
     return layout
@@ -31,13 +31,16 @@ fileList = fileDict["_FILES_"].split(';')
 fileAbsDir = '/'.join(fileList[0].split('/')[:-1])
 fileList = [filename.split('/')[-1].split('.')[0] for filename in fileList]
 
+displayImage = sg.Image(fileAbsDir + '/' + fileList[0] + '.png', key="imageContainer")
+inputWindow = sg.Window("[{}/{}] Please Input - {}".format(1, len(fileList), fileList[0]),
+                        inputFilenameLayout(displayImage))
+
 index = 0
-while index < len(fileList):
+while True:
     newFilename = ""
     response = {}
-    # try:
-    inputWindow = sg.Window("[{}/{}] Please input - {}".format(index + 1, len(fileList), fileList[index]), inputFilenameLayout(fileAbsDir, fileList[index]))
     event, response = inputWindow.Read()
+
     newFilename = response["Answer"]
 
     if event == "Previous" and index > 0:
@@ -50,11 +53,12 @@ while index < len(fileList):
         if newFilename != "":
             os.rename(os.path.join(fileAbsDir, fileList[index] + ".png"), os.path.join(fileAbsDir, newFilename + ".png"))
             fileList[index] = newFilename
-        # if index + 1 == len(fileList):
-        #     print('Here')
-        #     sg.Window("Finished!", [[sg.OK()]])
-        # else:
         index += 1
-    inputWindow.Close()
+    if index >= len(fileList):
+        break
+    inputWindow.FindElement("imageContainer").Update(fileAbsDir + '/' + fileList[index] + ".png")
+    inputWindow.TKroot.title("[{}/{}] Please input - {}".format(index, len(fileList), fileList[index]))
+
+inputWindow.Close()
 
 sg.Window("Finished!", [[sg.Text("Finished updating {} image labels.".format(len(fileList)))], [sg.OK()]]).Read()
