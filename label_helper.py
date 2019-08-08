@@ -4,12 +4,14 @@ import os
 nextBtn = sg.Button("Next")
 prevBtn = sg.Button("Previous")
 
+
 def selectFilesLayout():
     layout =[
                 [sg.Input(key=("_FILES_")), sg.FilesBrowse()],
                 [nextBtn]
     ]
     return layout
+
 
 def inputFilenameLayout(displayImage):
     layout = [
@@ -20,7 +22,7 @@ def inputFilenameLayout(displayImage):
     return layout
 
 
-browseWindow = sg.Window('Select Files', selectFilesLayout())
+browseWindow = sg.Window("Select Files", selectFilesLayout())
 event, fileDict = browseWindow.Read()
 if event != "Next" or len(fileDict["Browse"]) == 0:
     exit()
@@ -31,7 +33,7 @@ fileList = fileDict["_FILES_"].split(';')
 fileAbsDir = '/'.join(fileList[0].split('/')[:-1])
 fileList = [filename.split('/')[-1].split('.')[0] for filename in fileList]
 
-displayImage = sg.Image(fileAbsDir + '/' + fileList[0] + '.png', key="imageContainer")
+displayImage = sg.Image(fileAbsDir + '/' + fileList[0] + ".png", key="imageContainer")
 inputWindow = sg.Window("[{}/{}] Please Input - {}".format(1, len(fileList), fileList[0]),
                         inputFilenameLayout(displayImage))
 
